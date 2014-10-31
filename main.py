@@ -5,61 +5,43 @@ def main():
     deck = draw_card()
     
     # Setting up score board
-    num_of_players = int(input("How many players: "))
-    player_total = [0] * num_of_players
+    players = [0] * int(input("How many players: "))
     
     # Draw first two cards
-    for player in range(num_of_players):
-        for i in range(2):
-            player_total[player] += next(deck)
+    players = draw_two_cards(players, deck)
     
     #Game loop
     while(1):
         player_out = 0
-        for player in range(num_of_players):
+        for i in range(len(players)):
             # Has the player lost?
-            if player_total[player] >= 21:
+            if players[i] >= 21:
                 player_out += 1
                 continue
             
             # Show score and ask for move
-            print("\nPlayer {0}: {1}".format(player + 1, player_total[player]))
+            print_player_score(i, players[i])
             while(1):
                 move = input("Hit or stay: ").lower()
-                
                 # If hit draw another card and go back to game loop
                 if move == "hit":
-                    player_total[player] += next(deck)
-                    print("Player {0}: {1}".format(player + 1,
-                                                   player_total[player]))
+                    players[i] += next(deck)
+                    print_player_score(i, players[i])
                     break
-                # If break make score huge so it's ignored in loop
+                # If break make player ignored in loop
                 elif move == "stay":
-                    player_total[player] += 1000
+                    players[i] = player_stayed(players[i])
                     break
-        if player_out == num_of_players:
+            print()
+        if player_out == len(players):
             break
     
-    # End game score tally
-    top_score = 0
-    winners = []
-    
     # Find the top score
-    for player in range(num_of_players):
-        if player_total[player] >= 1000:
-            player_total[player] -= 1000
-        if top_score < player_total[player] < 22:
-            top_score = player_total[player]
-    
-    # Find those who have the top score
-    for player in range(num_of_players):
-        if player_total[player] == top_score:
-            winners.append(player)
+    players = fix_scores(players)
+    winners = get_winners(players, get_highest_score(players))
     
     # Print the winner
-    for winner in winners:
-        print("Player {0} wins with: {1}".format(winner + 1, top_score))
-    
+    print_winners(winners)
 
 def draw_card():
     deck = ([i for i in range(1, 10)] * 4) + ([10] * 16)
@@ -68,6 +50,45 @@ def draw_card():
     for i in range(56):
         yield deck[0]
         del deck[0]
+
+def get_highest_score(players):
+    top_score = 0
+    
+    for player in players:
+        if top_score < player < 22:
+            top_score = player
+    return top_score
+
+def get_winners(players, top_score):
+    winners = []
+    
+    for player in players:
+        if player == top_score:
+            winners.append(player)
+    return winners
+
+def draw_two_cards(players, deck):
+    output_score = []
+
+    for player in players:
+        output_score.append(next(deck) + next(deck))
+    
+    return output_score
+
+def print_player_score(player_number, player):
+    print("Player {0}: {1}".format(player_number + 1, player))
+
+def player_stayed(player):
+    return player + 1000
+
+def print_winners(winners):
+    for index, winner in enumerate(winners):
+        print("Player {0} wins with: {1}".format(index + 1, winner))
+
+def fix_scores(players):
+    for i in range(len(players)):
+        players[i] -= 1000 if players[i] >= 1000 else players[i]
+    return players
 
 if __name__ == '__main__':
     main()
