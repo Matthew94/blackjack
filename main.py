@@ -2,10 +2,7 @@ from random import shuffle
 
 def main():
     # Setting up deck
-    deck = []
-    deck += [i for i in range(1, 10)] * 4
-    deck += [10] * 16
-    shuffle(deck)
+    deck = draw_card()
     
     # Setting up score board
     num_of_players = int(input("How many players: "))
@@ -14,8 +11,7 @@ def main():
     # Draw first two cards
     for player in range(num_of_players):
         for i in range(2):
-            player_total[player] += deck[0]
-            del deck[0]
+            player_total[player] += next(deck)
     
     #Game loop
     while(1):
@@ -33,8 +29,7 @@ def main():
                 
                 # If hit draw another card and go back to game loop
                 if move == "hit":
-                    player_total[player] += deck[0]
-                    del deck[0]
+                    player_total[player] += next(deck)
                     print("Player {0}: {1}".format(player + 1,
                                                    player_total[player]))
                     break
@@ -65,6 +60,16 @@ def main():
     for winner in winners:
         print("Player {0} wins with: {1}".format(winner + 1, top_score))
     
+
+def draw_card():
+    deck = []
+    deck += [i for i in range(1, 10)] * 4
+    deck += [10] * 16
+    shuffle(deck)
     
+    for i in range(56):
+        yield deck[0]
+        del deck[0]
+
 if __name__ == '__main__':
     main()
