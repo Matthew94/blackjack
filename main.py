@@ -62,9 +62,7 @@ def main():
     
 
 def draw_card():
-    deck = []
-    deck += [i for i in range(1, 10)] * 4
-    deck += [10] * 16
+    deck = ([i for i in range(1, 10)] * 4) + ([10] * 16)
     shuffle(deck)
     
     for i in range(56):
